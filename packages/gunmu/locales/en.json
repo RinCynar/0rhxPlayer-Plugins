@@ -1,0 +1,13 @@
+{
+  "name": "Gunmu",
+  "description": "Official reference implementation demonstrating all host APIs, view slots, hooks, and event bus integrations.",
+  "workbench_title": "Gunmu Reference Workbench",
+  "audio_control": "Audio Playback & Transport Control",
+  "eq_dsp": "10-Band Parametric Equalizer & DSP",
+  "library_search": "Media Library & Search Index",
+  "playlists": "Playlists & User Favorites",
+  "lyrics_engine": "Synchronized Lyrics Engine",
+  "event_bus": "Host Event Bus & Lifecycle Signals",
+  "view_slots": "Registered View Slots & Action Injections",
+  "hooks": "Global System Hooks"
+}

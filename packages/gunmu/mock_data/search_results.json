@@ -1,0 +1,18 @@
+[
+  {
+    "title": "Gunmu Benchmark Sine Sweep (20Hz-20kHz)",
+    "artist": "0P Audio Lab",
+    "album": "Acoustic Verification Suite",
+    "duration": 180,
+    "format": "FLAC",
+    "bitrate": 1411
+  },
+  {
+    "title": "Reference Dynamic Pink Noise Test",
+    "artist": "0P Audio Lab",
+    "album": "Acoustic Verification Suite",
+    "duration": 120,
+    "format": "FLAC",
+    "bitrate": 1411
+  }
+]

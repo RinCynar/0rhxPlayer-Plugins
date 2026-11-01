@@ -1,0 +1,51 @@
+{
+  "type": "page",
+  "title": "Gunmu Reference Workbench",
+  "sections": [
+    {
+      "type": "banner",
+      "title": "Gunmu Reference Testbed",
+      "subtitle": "Official reference implementation demonstrating all 0rhxPlayer host APIs, slots, and events."
+    },
+    {
+      "type": "card",
+      "title": "Audio Playback & Transport Control",
+      "details": "Exposes play(), pause(), resume(), stop(), seek(ms), setVolume(0.0-1.0), and setPlayMode(0-3). Compatible with AudioEngine dispatch."
+    },
+    {
+      "type": "card",
+      "title": "10-Band Parametric Equalizer & DSP",
+      "details": "Supports getEqBands(), setEqBand(index, gainDb), getEqPreamp(), setEqPreamp(gainDb), applyEqPreset(presetName), and resetEq() across all 10 audio bands."
+    },
+    {
+      "type": "card",
+      "title": "Media Library & Search Index",
+      "details": "Enables getLibraryTrackCount(), getAllTracks(limit, offset), getAllAlbums(), getAllArtists(), searchLibrary(keyword), and rescanLibrary()."
+    },
+    {
+      "type": "card",
+      "title": "Playlists & User Favorites",
+      "details": "Allows createPlaylist(name), deletePlaylist(id), renamePlaylist(id, name), addTracksToPlaylist(id, tracks), removeTracksFromPlaylist(id, tracks), and toggleFavorite(trackPath)."
+    },
+    {
+      "type": "card",
+      "title": "Synchronized Lyrics Engine",
+      "details": "Provides loadLrcContent(lrcText), clearLyrics(), hasLyrics(), getLyricCount(), and getLyricLine(index) for runtime LRC stream manipulation."
+    },
+    {
+      "type": "card",
+      "title": "Host Event Bus & Lifecycle Signals",
+      "details": "Monitors playbackStateChanged, positionChanged, trackChanged, volumeChanged, playModeChanged, eqChanged, queueChanged, libraryChanged, and favoritesChanged."
+    },
+    {
+      "type": "card",
+      "title": "Registered View Slots & Action Injections",
+      "details": "Entries registered: entries.contextMenu.track (Track Action), entries.contextMenu.album (Album Action), entries.contextMenu.playlist (Playlist Action), and entries.playbackControl (Player Bar Control)."
+    },
+    {
+      "type": "card",
+      "title": "Global System Hooks",
+      "details": "Hooks registered: hooks.search (query interceptor via mock_data/search_results.json) and hooks.lyricsProvider (dynamic external lyric supplier)."
+    }
+  ]
+}

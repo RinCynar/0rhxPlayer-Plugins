@@ -1,0 +1,36 @@
+{
+  "type": "page",
+  "title": "Audio Converter Workbench",
+  "sections": [
+    {
+      "type": "banner",
+      "title": "Audio Converter Workbench",
+      "subtitle": "Professional lossless and high-fidelity audio transcoding powered by ffmpeg and flac."
+    },
+    {
+      "type": "card",
+      "title": "System PATH Toolchain Detection",
+      "details": "Probing system PATH for transcoding binaries: FFmpeg [Detected / Available] | FLAC [Detected / Available]."
+    },
+    {
+      "type": "card",
+      "title": "Target Format Configuration",
+      "details": "Supported Formats: FLAC (Compression level 0-8), WAV (16-bit / 24-bit / 32-bit Float PCM), MP3 (320kbps CBR / V0 VBR), AAC/M4A (High Efficiency / LC), Opus (64k-320k VBR), and OGG Vorbis (Quality 0-10)."
+    },
+    {
+      "type": "card",
+      "title": "Audio Resampling & Channels",
+      "details": "Sample Rate: Keep Original, 44.1 kHz, 48.0 kHz, 96.0 kHz, 192.0 kHz. Channel Layout: Keep Original, Stereo (2 channels), Mono (1 channel). Bit Depth: Source Bit Depth, 16-bit, 24-bit, 32-bit Float."
+    },
+    {
+      "type": "card",
+      "title": "Export Directory Strategy",
+      "details": "Destination Options: Export next to source audio file (same directory) or export into dedicated target directory (default: ./Converted). Configurable overwrite protection."
+    },
+    {
+      "type": "card",
+      "title": "Transcoding Queue & Execution Control",
+      "details": "Asynchronous non-blocking process queue manager. Dispatches transcoding jobs in sequence, monitors CPU utilization, and delivers native host Toast notifications upon completion."
+    }
+  ]
+}

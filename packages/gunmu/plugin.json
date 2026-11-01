@@ -1,0 +1,62 @@
+{
+  "$schema": "https://raw.githubusercontent.com/RinCynar/0rhxPlayer-Plugins/main/schema/v1/plugin.schema.json",
+  "id": "top.rincynar.plugin.gunmu",
+  "name": "Gunmu",
+  "version": "1.0.0",
+  "author": "RinCynar",
+  "description": "Official reference implementation demonstrating all host APIs, view slots, hooks, and event bus integrations.",
+  "category": "Test",
+  "homepage": "https://github.com/RinCynar/0rhxPlayer-Plugins",
+  "minAppVersion": "1.1.1",
+  "permissions": [
+    "audio:control",
+    "audio:state",
+    "library:read",
+    "library:write",
+    "lyrics:read",
+    "lyrics:write",
+    "ui:slot:menu",
+    "ui:slot:sidebar",
+    "ui:slot:bottombar",
+    "network:fetch"
+  ],
+  "entries": {
+    "sidebar": {
+      "enabled": true,
+      "title": "Gunmu",
+      "icon": "assets/icon.svg",
+      "schema": "views/workbench.json"
+    },
+    "contextMenu": {
+      "track": {
+        "enabled": true,
+        "id": "gunmu_track_action",
+        "title": "Gunmu: Track Action",
+        "icon": "assets/icon.svg"
+      },
+      "album": {
+        "enabled": true,
+        "id": "gunmu_album_action",
+        "title": "Gunmu: Album Action",
+        "icon": "assets/icon.svg"
+      },
+      "playlist": {
+        "enabled": true,
+        "id": "gunmu_playlist_action",
+        "title": "Gunmu: Playlist Action",
+        "icon": "assets/icon.svg"
+      }
+    },
+    "playbackControl": {
+      "enabled": true,
+      "id": "gunmu_player_action",
+      "title": "Gunmu Action",
+      "icon": "assets/icon.svg"
+    }
+  },
+  "hooks": {
+    "search": true,
+    "mediaSource": false,
+    "lyricsProvider": true
+  }
+}

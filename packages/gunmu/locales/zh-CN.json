@@ -1,0 +1,13 @@
+{
+  "name": "Gunmu",
+  "description": "展示 0P 全域开放接口、视图插槽、全局钩子与事件总线的官方参考实现。",
+  "workbench_title": "Gunmu 参考工作台",
+  "audio_control": "音频播放与传输控制",
+  "eq_dsp": "10段参数均衡器与 DSP",
+  "library_search": "媒体曲库与检索索引",
+  "playlists": "歌单与用户收藏",
+  "lyrics_engine": "同步歌词引擎",
+  "event_bus": "宿主事件总线与生命周期信号",
+  "view_slots": "已注册视图插槽与动作注入",
+  "hooks": "全局系统钩子"
+}

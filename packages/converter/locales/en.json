@@ -1,0 +1,11 @@
+{
+  "name": "Audio Converter",
+  "description": "Professional high-fidelity audio transcoder supporting FLAC, WAV, MP3, AAC, Opus, and OGG with system PATH toolchain detection.",
+  "workbench_title": "Audio Converter Workbench",
+  "modal_title": "Quick Audio Converter",
+  "toolchain_title": "System PATH Toolchain Detection",
+  "formats_title": "Target Format Configuration",
+  "resampling_title": "Audio Resampling & Channels",
+  "export_dir_title": "Export Directory Strategy",
+  "queue_title": "Transcoding Queue & Execution Control"
+}

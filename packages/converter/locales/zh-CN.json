@@ -1,0 +1,11 @@
+{
+  "name": "Audio Converter",
+  "description": "基于系统 PATH 工具链探测的专业音频转码插件，支持 FLAC、WAV、MP3、AAC、Opus 与 OGG。",
+  "workbench_title": "音频转码工作台",
+  "modal_title": "快速转码窗口",
+  "toolchain_title": "系统 PATH 工具链探测",
+  "formats_title": "目标音频格式配置",
+  "resampling_title": "音频重采样与声道布局",
+  "export_dir_title": "输出目录导出策略",
+  "queue_title": "转码队列与执行调度"
+}

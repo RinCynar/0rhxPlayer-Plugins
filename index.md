@@ -7,31 +7,106 @@
       "name": "Gunmu",
       "version": "1.0.0",
       "author": "RinCynar",
-      "description": "description test",
+      "description": "Official reference implementation demonstrating all host APIs, view slots, hooks, and event bus integrations.",
       "category": "Test",
       "path": "Test/gunmu.0px",
-      "size": 631,
-      "sha256": "498df3c17a3d46dce9191cc6ed6e3e058fc92d4e6acb63c10399a182ee4624b1",
-      "$schema": "https://0rhxplayer.rincynar.top/schemas/plugin-v1.json",
-      "apiVersion": 1,
-      "type": "dummy",
-      "sidebar": {
-        "enabled": true,
-        "title": "Gunmu",
-        "icon": "bug_report"
+      "size": 7189,
+      "sha256": "9e66b41884ab9e2ffe3ed24e166bc5d5a7ac1742a94fc1a7847a9fbbf7592593",
+      "$schema": "https://raw.githubusercontent.com/RinCynar/0rhxPlayer-Plugins/main/schema/v1/plugin.schema.json",
+      "homepage": "https://github.com/RinCynar/0rhxPlayer-Plugins",
+      "minAppVersion": "1.1.1",
+      "permissions": [
+        "audio:control",
+        "audio:state",
+        "library:read",
+        "library:write",
+        "lyrics:read",
+        "lyrics:write",
+        "ui:slot:menu",
+        "ui:slot:sidebar",
+        "ui:slot:bottombar",
+        "network:fetch"
+      ],
+      "entries": {
+        "sidebar": {
+          "enabled": true,
+          "title": "Gunmu",
+          "icon": "assets/icon.svg",
+          "schema": "views/workbench.json"
+        },
+        "contextMenu": {
+          "track": {
+            "enabled": true,
+            "id": "gunmu_track_action",
+            "title": "Gunmu: Track Action",
+            "icon": "assets/icon.svg"
+          },
+          "album": {
+            "enabled": true,
+            "id": "gunmu_album_action",
+            "title": "Gunmu: Album Action",
+            "icon": "assets/icon.svg"
+          },
+          "playlist": {
+            "enabled": true,
+            "id": "gunmu_playlist_action",
+            "title": "Gunmu: Playlist Action",
+            "icon": "assets/icon.svg"
+          }
+        },
+        "playbackControl": {
+          "enabled": true,
+          "id": "gunmu_player_action",
+          "title": "Gunmu Action",
+          "icon": "assets/icon.svg"
+        }
       },
-      "permissions": []
+      "hooks": {
+        "search": true,
+        "mediaSource": false,
+        "lyricsProvider": true
+      }
     },
     {
-      "id": "Converter",
-      "name": "Converter",
+      "id": "top.rincynar.converter",
+      "name": "Audio Converter",
       "version": "1.0.0",
-      "author": "Unknown",
-      "description": "No description provided.",
+      "author": "RinCynar",
+      "description": "Professional high-fidelity audio transcoder supporting FLAC, WAV, MP3, AAC, Opus, and OGG with system PATH toolchain detection.",
       "category": "Tools",
       "path": "Tools/Converter.0px",
-      "size": 0,
-      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      "size": 6987,
+      "sha256": "0c0a5c9cd5c94927a2f1401206e5eb91977171fbe42f4c0c01f7c0a0d3178a0e",
+      "$schema": "https://raw.githubusercontent.com/RinCynar/0rhxPlayer-Plugins/main/schema/v1/plugin.schema.json",
+      "homepage": "https://github.com/RinCynar/0rhxPlayer-Plugins",
+      "minAppVersion": "1.1.1",
+      "permissions": [
+        "audio:state",
+        "library:read",
+        "ui:slot:menu",
+        "ui:slot:sidebar"
+      ],
+      "entries": {
+        "sidebar": {
+          "enabled": true,
+          "title": "Audio Converter",
+          "icon": "assets/icon.svg",
+          "schema": "views/workbench.json"
+        },
+        "contextMenu": {
+          "track": {
+            "enabled": true,
+            "id": "convert_track",
+            "title": "Convert Audio...",
+            "icon": "assets/icon.svg"
+          }
+        }
+      },
+      "hooks": {
+        "search": false,
+        "mediaSource": false,
+        "lyricsProvider": false
+      }
     }
   ]
 }
@@ -45,11 +120,11 @@
 
 | 插件名称 | ID | 版本 | 作者 | 描述 | 下载 |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Gunmu** | `top.rincynar.plugin.gunmu` | `1.0.0` | RinCynar | description test | [下载](Test/gunmu.0px) |
+| **Gunmu** | `top.rincynar.plugin.gunmu` | `1.0.0` | RinCynar | Official reference implementation demonstrating all host APIs, view slots, hooks, and event bus integrations. | [下载](Test/gunmu.0px) |
 
 ## Tools
 
 | 插件名称 | ID | 版本 | 作者 | 描述 | 下载 |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Converter** | `Converter` | `1.0.0` | Unknown | No description provided. | [下载](Tools/Converter.0px) |
+| **Audio Converter** | `top.rincynar.converter` | `1.0.0` | RinCynar | Professional high-fidelity audio transcoder supporting FLAC, WAV, MP3, AAC, Opus, and OGG with system PATH toolchain detection. | [下载](Tools/Converter.0px) |
 

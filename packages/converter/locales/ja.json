@@ -1,0 +1,11 @@
+{
+  "name": "Audio Converter",
+  "description": "システム PATH ツールチェーン検出を備えたプロフェッショナル高音質音声変換プラグイン（FLAC、WAV、MP3、AAC、Opus、OGG 対応）。",
+  "workbench_title": "音声変換ワークベンチ",
+  "modal_title": "クイック音声変換",
+  "toolchain_title": "システム PATH ツールチェーン検出",
+  "formats_title": "出力フォーマット設定",
+  "resampling_title": "リサンプリング・チャンネルレイアウト",
+  "export_dir_title": "出力先ディレクトリ方針",
+  "queue_title": "変換キュー・実行制御"
+}
