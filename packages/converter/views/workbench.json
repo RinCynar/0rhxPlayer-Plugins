@@ -9,28 +9,33 @@
     },
     {
       "type": "card",
-      "title": "System PATH Toolchain Detection",
-      "details": "Probing system PATH for transcoding binaries: FFmpeg [Detected / Available] | FLAC [Detected / Available]."
+      "title": "System PATH Toolchain Probe",
+      "details": "Environment status: FFmpeg [Detected / Available] | FLAC [Detected / Available]. Audio transcoding binaries verified in system PATH."
+    },
+    {
+      "type": "card",
+      "title": "Transcoding Queue (Job List)",
+      "details": "Right-click any song in your track list and select 'Add to Convert Queue' to populate this queue. Tracks will be converted in sequence upon clicking 'Start Transcoding'."
     },
     {
       "type": "card",
       "title": "Target Format Configuration",
-      "details": "Supported Formats: FLAC (Compression level 0-8), WAV (16-bit / 24-bit / 32-bit Float PCM), MP3 (320kbps CBR / V0 VBR), AAC/M4A (High Efficiency / LC), Opus (64k-320k VBR), and OGG Vorbis (Quality 0-10)."
+      "details": "Supported target formats: FLAC (Lossless compression levels 0-8), WAV (16-bit / 24-bit / 32-bit Float PCM), MP3 (320kbps CBR / V0 VBR), AAC/M4A (256kbps), Opus (64k-320k VBR), and OGG Vorbis."
     },
     {
       "type": "card",
-      "title": "Audio Resampling & Channels",
-      "details": "Sample Rate: Keep Original, 44.1 kHz, 48.0 kHz, 96.0 kHz, 192.0 kHz. Channel Layout: Keep Original, Stereo (2 channels), Mono (1 channel). Bit Depth: Source Bit Depth, 16-bit, 24-bit, 32-bit Float."
+      "title": "Audio Resampling & Channel Layout",
+      "details": "Resampling rates: Keep Original, 44.1 kHz, 48.0 kHz, 96.0 kHz, 192.0 kHz. Channel modes: Keep Original, Stereo (2 channels), Mono (1 channel). Bit depth: Source, 16-bit, 24-bit, 32-bit Float."
     },
     {
       "type": "card",
       "title": "Export Directory Strategy",
-      "details": "Destination Options: Export next to source audio file (same directory) or export into dedicated target directory (default: ./Converted). Configurable overwrite protection."
+      "details": "Destination options: Export alongside source file (same directory) or export to dedicated output folder (default: ./Converted). Safe overwrite handling."
     },
     {
       "type": "card",
-      "title": "Transcoding Queue & Execution Control",
-      "details": "Asynchronous non-blocking process queue manager. Dispatches transcoding jobs in sequence, monitors CPU utilization, and delivers native host Toast notifications upon completion."
+      "title": "Start Transcoding (Batch Execution)",
+      "details": "Action: Click to start processing all tracks in the transcode queue. Non-blocking asynchronous task execution with live progress reporting and host Toast feedback upon completion."
     }
   ]
 }

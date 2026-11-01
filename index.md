@@ -72,11 +72,11 @@
       "name": "Audio Converter",
       "version": "1.0.0",
       "author": "RinCynar",
-      "description": "Professional high-fidelity audio transcoder supporting FLAC, WAV, MP3, AAC, Opus, and OGG with system PATH toolchain detection.",
+      "description": "Professional high-fidelity audio transcoder supporting FLAC, WAV, MP3, AAC, Opus, and OGG with queue management and system PATH toolchain detection.",
       "category": "Tools",
       "path": "Tools/Converter.0px",
-      "size": 6987,
-      "sha256": "0c0a5c9cd5c94927a2f1401206e5eb91977171fbe42f4c0c01f7c0a0d3178a0e",
+      "size": 7263,
+      "sha256": "afce0303cbf06bbc77b3bc7acf550697653df1c8b8f305523cb0d0cca2c1c33a",
       "$schema": "https://raw.githubusercontent.com/RinCynar/0rhxPlayer-Plugins/main/schema/v1/plugin.schema.json",
       "homepage": "https://github.com/RinCynar/0rhxPlayer-Plugins",
       "minAppVersion": "1.1.1",
@@ -96,8 +96,8 @@
         "contextMenu": {
           "track": {
             "enabled": true,
-            "id": "convert_track",
-            "title": "Convert Audio...",
+            "id": "add_to_convert_queue",
+            "title": "Add to Convert Queue",
             "icon": "assets/icon.svg"
           }
         }
@@ -126,5 +126,5 @@
 
 | 插件名称 | ID | 版本 | 作者 | 描述 | 下载 |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Audio Converter** | `top.rincynar.converter` | `1.0.0` | RinCynar | Professional high-fidelity audio transcoder supporting FLAC, WAV, MP3, AAC, Opus, and OGG with system PATH toolchain detection. | [下载](Tools/Converter.0px) |
+| **Audio Converter** | `top.rincynar.converter` | `1.0.0` | RinCynar | Professional high-fidelity audio transcoder supporting FLAC, WAV, MP3, AAC, Opus, and OGG with queue management and system PATH toolchain detection. | [下载](Tools/Converter.0px) |
 
