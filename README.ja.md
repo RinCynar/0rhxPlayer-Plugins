@@ -2,6 +2,8 @@
 
 [English](README.md) | [日本語](README.ja.md) | [简体中文](README.zh-CN.md)
 
+[![開発者ガイド](https://img.shields.io/badge/開発者ガイド-API%20仕様書-blue?style=flat-square&logo=gitbook)](doc/DEVELOPER_GUIDE.md)
+
 **0rhxPlayer (0P)** 公式プラグイン配布・インデックスリポジトリ。
 
 本リポジトリは GitHub Actions を通じて `index.md` カタログを自動管理しています。0rhxPlayer デスクトップアプリ内の「Plugins」マーケットが本カタログを読み込み、リアルタイム検索、カテゴリ別閲覧、ワンクリックインストールを提供します。
@@ -12,20 +14,23 @@
 
 各プラグインは機能カテゴリごとに分類されています：
 
----
-
-0rhxPlayer-Plugin/
+```
+0rhxPlayer-Plugins/
 ├── .github/workflows/
 │   └── update-index.yml       # カタログ自動更新ワークフロー
 ├── NetService/                # クラウド音楽・オンラインメディアソース（網易雲、Subsonic、WebDAV など）
 ├── Lyrics/                    # オンライン歌詞・同期歌詞プロバイダ
 ├── Metadata/                  # カバーアート取得・タグ補完
 ├── DSP/                       # ネイティブ DSP 音響効果（リバーブ、コンプレッサーなど）
-├── Test/                      # 検証・デバッグ用ダミープラグイン
-│   └── gunmu.0px              # 動作確認用最小パッケージ
+├── Tools/                     # ユーティリティ・音声変換プラグイン
+│   └── Converter.0px          # プロフェッショナル高音質音声変換プラグイン
+├── Test/                      # 検証・デバッグ用リファレンスプラグイン
+│   └── gunmu.0px              # 全能力リファレンス検証パッケージ
 ├── doc/                       # 開発者ガイドおよび API 仕様書（CI インデックス対象外）
+│   └── DEVELOPER_GUIDE.md     # 3言語完全対称の開発者仕様書マニュアル
 ├── index.md                   # 自動生成されるプラグイン総合目録
 └── README.md
+```
 
 ---
 
@@ -42,7 +47,11 @@
 
 ## プラグインの開発について
 
-利用可能な API 定義、パーミッション一覧、データスキーマの詳細については [開発者ガイド & API 仕様書](doc/DEVELOPER_GUIDE.md) をご参照ください。
+利用可能な API 定義、パーミッション一覧、データスキーマの詳細については、開発者仕様書マニュアルをご参照ください：
+
+[![開発者ガイドを開く](https://img.shields.io/badge/📖%20開く-開発者ガイド%20%26%20API%20仕様書-2ea44f?style=for-the-badge)](doc/DEVELOPER_GUIDE.md)
+
+本仕様書は英語、日本語、簡体中国語の 3 言語で完全に網羅されています。[doc/DEVELOPER_GUIDE.md](doc/DEVELOPER_GUIDE.md) をご覧ください。
 
 ---
 
