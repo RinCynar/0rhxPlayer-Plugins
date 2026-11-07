@@ -56,25 +56,10 @@
 
         // 5. Injected Action Listener
         bindActions: function() {
-            if (typeof PluginManager === 'undefined') return;
-
-            this._onPluginActionTriggered = function(pluginId, actionId, slotType, data) {
-                if (pluginId === Converter.id) {
-                    Converter.onAction(actionId, slotType, data);
-                }
-            };
-            PluginManager.pluginActionTriggered.connect(this._onPluginActionTriggered);
+            // Invocations are directly dispatched by Host PluginManager
         },
 
         unbindActions: function() {
-            if (typeof PluginManager === 'undefined') return;
-            try {
-                if (this._onPluginActionTriggered) {
-                    PluginManager.pluginActionTriggered.disconnect(this._onPluginActionTriggered);
-                }
-            } catch (e) {
-                // Ignore disconnect errors
-            }
         },
 
         // 6. Action Dispatcher
@@ -93,12 +78,39 @@
         // Context menu handler: Append track to queue
         addTrackFromContext: function(payload) {
             const track = (payload && payload.data) ? payload.data : payload;
-            if (!track || (!track.filePath && !track.path)) {
+            if (!track) {
                 this.showToast('[Converter Error] Invalid track metadata received.');
                 return;
             }
 
+            // Support batch tracks passed via paths array
+            const paths = (track.paths && track.paths.length > 0) ? track.paths : (payload && payload.paths ? payload.paths : null);
+            if (paths && paths.length > 1) {
+                let added = 0;
+                for (let i = 0; i < paths.length; i++) {
+                    const p = paths[i];
+                    if (!p) continue;
+                    const fileName = p.split(/[\\/]/).pop();
+                    this.addToQueue({
+                        filePath: p,
+                        title: fileName,
+                        artist: track.artist || '',
+                        album: track.album || ''
+                    });
+                    added++;
+                }
+                const msg = `[Converter] Added ${added} tracks to queue (Total: ${this.queue.length}).`;
+                this.showToast(msg);
+                this.notifyHost();
+                return;
+            }
+
             const sourcePath = track.filePath || track.path;
+            if (!sourcePath) {
+                this.showToast('[Converter Error] No file path provided.');
+                return;
+            }
+
             const title = track.title || sourcePath.split(/[\\/]/).pop();
             this.addToQueue({
                 filePath: sourcePath,
@@ -226,15 +238,40 @@
             const cmd = this.buildCommand(nextTask.sourcePath, nextTask.targetPath, this.settings);
             this.log(`[Converter] Command dispatch: ${cmd.binary} ${cmd.args.join(' ')}`);
 
-            const self = this;
-            setTimeout(function() {
+            let success = false;
+            if (typeof PluginManager !== 'undefined' && PluginManager.runProcess) {
+                try {
+                    success = PluginManager.runProcess(cmd.binary, cmd.args);
+                } catch (e) {
+                    this.log(`[Converter] runProcess exception: ${e}`);
+                    success = false;
+                }
+            } else {
+                this.log('[Converter] PluginManager.runProcess not available');
+            }
+
+            if (success) {
                 nextTask.status = 'completed';
                 nextTask.progress = 100;
-                self.log(`[Converter] Completed track: ${nextTask.title} -> ${nextTask.targetPath}`);
-                self.activeTask = null;
-                self.notifyHost();
-                self.processNextInQueue();
-            }, 300);
+                this.log(`[Converter] Completed track: ${nextTask.title} -> ${nextTask.targetPath}`);
+                this.showToast(`[Converter] Transcoded: ${nextTask.title}`);
+            } else {
+                nextTask.status = 'failed';
+                this.log(`[Converter] Failed to transcode track: ${nextTask.title}`);
+                this.showToast(`[Converter] Failed: ${nextTask.title}`);
+            }
+
+            this.activeTask = null;
+            this.notifyHost();
+
+            const self = this;
+            if (typeof setTimeout !== 'undefined') {
+                setTimeout(function() {
+                    self.processNextInQueue();
+                }, 50);
+            } else {
+                this.processNextInQueue();
+            }
         },
 
         // Command builder
@@ -242,6 +279,9 @@
             const opts = Object.assign({}, this.settings, options);
             const args = ['-i', sourceFilePath];
             const fmt = opts.format.toLowerCase();
+
+            // Strip video/album art to avoid failure on containers that do not support video streams (e.g. WAV)
+            args.push('-vn');
 
             // Audio codec selection
             if (fmt === 'mp3') {
@@ -267,6 +307,9 @@
                 }
             } else if (fmt === 'flac') {
                 args.push('-c:a', 'flac');
+                if (opts.quality && opts.quality.indexOf('16-bit') !== -1) {
+                    args.push('-sample_fmt', 's16');
+                }
                 args.push('-compression_level', '5');
             } else if (fmt === 'aac' || fmt === 'm4a') {
                 args.push('-c:a', 'aac');
@@ -306,8 +349,8 @@
             // Channels
             const ch = opts.channels;
             if (ch && ch !== 'Keep Original' && ch !== 'original') {
-                if (ch.indexOf('Stereo') !== -1) args.push('-ac', '2');
-                else if (ch.indexOf('Mono') !== -1) args.push('-ac', '1');
+                if (ch.indexOf('Stereo') !== -1 || ch.indexOf('2ch') !== -1) args.push('-ac', '2');
+                else if (ch.indexOf('Mono') !== -1 || ch.indexOf('1ch') !== -1) args.push('-ac', '1');
             }
 
             // Overwrite flag and destination
@@ -321,22 +364,37 @@
 
         // Output destination path generator
         generateOutputPath: function(sourcePath, targetFormat, outputDirOption) {
-            const lastSlash = Math.max(sourcePath.lastIndexOf('/'), sourcePath.lastIndexOf('\\'));
-            const dir = (lastSlash !== -1) ? sourcePath.substring(0, lastSlash) : '.';
-            const filename = (lastSlash !== -1) ? sourcePath.substring(lastSlash + 1) : sourcePath;
+            let cleanPath = sourcePath || '';
+            if (cleanPath.startsWith('file:///')) {
+                cleanPath = decodeURIComponent(cleanPath.substring(8));
+                if (/^[a-zA-Z]:/.test(cleanPath) === false && /^\/[a-zA-Z]:/.test(cleanPath)) {
+                    cleanPath = cleanPath.substring(1);
+                }
+            }
+
+            const lastSlash = Math.max(cleanPath.lastIndexOf('/'), cleanPath.lastIndexOf('\\'));
+            const dir = (lastSlash !== -1) ? cleanPath.substring(0, lastSlash) : '.';
+            const filename = (lastSlash !== -1) ? cleanPath.substring(lastSlash + 1) : cleanPath;
             const dotIdx = filename.lastIndexOf('.');
             const baseName = (dotIdx !== -1) ? filename.substring(0, dotIdx) : filename;
 
-            let ext = targetFormat.toLowerCase();
+            let ext = (targetFormat || 'mp3').toLowerCase();
             if (ext === 'aac') ext = 'm4a';
 
             let targetDir = dir;
             if (outputDirOption && outputDirOption.indexOf('Converted') !== -1) {
-                targetDir = dir + (sourcePath.indexOf('\\') !== -1 ? '\\' : '/') + 'Converted';
+                targetDir = dir + (cleanPath.indexOf('\\') !== -1 ? '\\' : '/') + 'Converted';
             }
 
-            const sep = (sourcePath.indexOf('\\') !== -1) ? '\\' : '/';
-            return `${targetDir}${sep}${baseName}.${ext}`;
+            const sep = (cleanPath.indexOf('\\') !== -1) ? '\\' : '/';
+            let outPath = `${targetDir}${sep}${baseName}.${ext}`;
+
+            // Prevent overwriting source file when outputting to same folder with same format
+            if (outPath.toLowerCase() === cleanPath.toLowerCase()) {
+                outPath = `${targetDir}${sep}${baseName}_converted.${ext}`;
+            }
+
+            return outPath;
         },
 
         // Notify host QML of view updates
