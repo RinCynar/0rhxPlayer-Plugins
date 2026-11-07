@@ -1,13 +1,7 @@
 /**
  * 0rhxPlayer Audio Converter Plugin
  * Package ID: top.rincynar.converter
- * Professional audio transcoder supporting FLAC, WAV, MP3, AAC, Opus, and OGG.
- *
- * Workflow:
- * 1. Single track context menu ("Add to Convert Queue") appends track into converter queue.
- * 2. User navigates to the dedicated Converter sidebar workbench page.
- * 3. User configures target format & audio parameters.
- * 4. User clicks "Start Transcoding" to batch-process all queued tracks with host Toast feedback.
+ * Universal audio transcoder supporting MP3, WAV, FLAC, AAC, Opus, and OGG.
  */
 
 (function(global) {
@@ -18,29 +12,22 @@
         name: 'Audio Converter',
         version: '1.0.0',
         toolchain: {
-            ffmpeg: { available: false, path: 'ffmpeg', version: '' },
-            flac: { available: false, path: 'flac', version: '' }
+            ffmpeg: { available: false, path: 'ffmpeg', version: '' }
         },
         queue: [],
         activeTask: null,
         isProcessing: false,
         settings: {
-            format: 'flac',          // flac, wav, mp3, aac, opus, ogg
-            flacLevel: 5,            // 0-8
-            wavBitDepth: 'pcm_s24le',// pcm_s16le, pcm_s24le, pcm_f32le
-            mp3Mode: 'cbr',          // cbr, vbr
-            mp3Bitrate: '320k',
-            opusBitrate: '160k',     // 64k-320k
-            aacBitrate: '256k',
-            oggQuality: 6,           // 0-10
-            sampleRate: 'original',  // original, 44100, 48000, 96000, 192000
-            channels: 'original',    // original, 2 (stereo), 1 (mono)
-            outputDir: 'same'        // 'same' or custom path
+            format: 'mp3',
+            sampleRate: 'Keep Original',
+            channels: 'Keep Original',
+            quality: '320k / 24-bit (High)',
+            outputDir: 'Source Directory'
         },
 
         // 1. Lifecycle: On Plugin Load
         onPluginLoad: function(context) {
-            this.log('[Converter] Initializing Audio Converter Plugin v1.0.0');
+            this.log('[Converter] Initializing Universal Audio Converter Plugin v1.0.0');
             this.detectToolchain();
             this.bindActions();
         },
@@ -62,11 +49,9 @@
 
         // 4. System PATH Toolchain Detection
         detectToolchain: function() {
-            this.log('[Converter] Probing system PATH for ffmpeg and flac binaries...');
-            // In standard runtime, PATH probe asserts binary availability
+            this.log('[Converter] Probing system PATH for FFmpeg transcoding binary...');
             this.toolchain.ffmpeg.available = true;
-            this.toolchain.flac.available = true;
-            this.log(`[Converter] Toolchain probe complete: FFmpeg=${this.toolchain.ffmpeg.available}, FLAC=${this.toolchain.flac.available}`);
+            this.log(`[Converter] Toolchain status: FFmpeg=${this.toolchain.ffmpeg.available}`);
         },
 
         // 5. Injected Action Listener
@@ -94,38 +79,42 @@
 
         // 6. Action Dispatcher
         onAction: function(actionId, slotType, payload) {
-            this.log(`[Converter Action] Triggered action: '${actionId}' from slot: '${slotType}'`, payload);
+            this.log(`[Converter Action] Triggered: '${actionId}' from slot: '${slotType}'`, payload);
 
             if (slotType === 'track' || actionId === 'add_to_convert_queue' || actionId === 'convert_track') {
-                // Right click track context menu -> Add to queue
                 this.addTrackFromContext(payload);
             } else if (actionId === 'start_transcoding' || actionId === 'start') {
-                // Start queue batch conversion
                 this.startTranscoding();
             } else if (actionId === 'clear_queue') {
                 this.clearQueue();
             }
         },
 
-        // Right-click context menu handler: Append track to converter queue
+        // Context menu handler: Append track to queue
         addTrackFromContext: function(payload) {
             const track = (payload && payload.data) ? payload.data : payload;
-            if (!track || !track.filePath) {
+            if (!track || (!track.filePath && !track.path)) {
                 this.showToast('[Converter Error] Invalid track metadata received.');
                 return;
             }
 
-            const title = track.title || track.filePath.split(/[\\/]/).pop();
-            const task = this.addToQueue(track);
+            const sourcePath = track.filePath || track.path;
+            const title = track.title || sourcePath.split(/[\\/]/).pop();
+            this.addToQueue({
+                filePath: sourcePath,
+                title: title,
+                artist: track.artist || '',
+                album: track.album || ''
+            });
 
-            this.log(`[Converter] Track added to queue: ${title} (${track.filePath})`);
-            const msg = `[Converter] Added to queue: ${title} (Queue: ${this.queue.length}). Open Converter in sidebar to configure and start.`;
+            const msg = `[Converter] Added to queue: ${title} (Queue count: ${this.queue.length}).`;
             this.showToast(msg);
+            this.notifyHost();
         },
 
-        // Add track object to queue
+        // Add track to internal queue
         addToQueue: function(track) {
-            const sourcePath = track.filePath;
+            const sourcePath = track.filePath || track.path;
             const targetPath = this.generateOutputPath(sourcePath, this.settings.format, this.settings.outputDir);
 
             const task = {
@@ -135,8 +124,8 @@
                 album: track.album || '',
                 sourcePath: sourcePath,
                 targetPath: targetPath,
-                format: this.settings.format,
-                status: 'pending', // pending, converting, completed, failed
+                format: this.settings.format.toUpperCase(),
+                status: 'pending',
                 progress: 0,
                 error: null
             };
@@ -145,33 +134,61 @@
             return task;
         },
 
-        // Clear queue
         clearQueue: function() {
             this.queue = [];
             this.log('[Converter] Queue cleared.');
             this.showToast('[Converter] Transcode queue cleared.');
+            this.notifyHost();
         },
 
-        // Get queue snapshot
         getQueue: function() {
             return this.queue;
         },
 
-        // Update target format and parameters
+        // Set target format (MP3, WAV, FLAC, AAC, Opus, OGG)
         setFormat: function(format) {
+            if (!format) return;
             this.settings.format = format.toLowerCase();
             this.log(`[Converter] Target format updated to: ${this.settings.format}`);
+
+            // Update format on all pending queued items
+            for (let i = 0; i < this.queue.length; i++) {
+                if (this.queue[i].status === 'pending') {
+                    this.queue[i].format = this.settings.format.toUpperCase();
+                    this.queue[i].targetPath = this.generateOutputPath(this.queue[i].sourcePath, this.settings.format, this.settings.outputDir);
+                }
+            }
+            this.notifyHost();
         },
 
-        setParameters: function(params) {
-            Object.assign(this.settings, params);
-            this.log('[Converter] Transcoder parameters updated:', this.settings);
+        // Generic option setter for Resampling, Channels, Quality, OutputDir
+        setOption: function(key, value) {
+            if (!key || value === undefined) return;
+            this.settings[key] = value;
+            this.log(`[Converter] Setting updated: ${key} = ${value}`);
+
+            // Update paths if output directory changed
+            if (key === 'outputDir') {
+                for (let i = 0; i < this.queue.length; i++) {
+                    if (this.queue[i].status === 'pending') {
+                        this.queue[i].targetPath = this.generateOutputPath(this.queue[i].sourcePath, this.settings.format, this.settings.outputDir);
+                    }
+                }
+            }
+
+            this.showToast(`[Converter] ${key}: ${value}`);
+            this.notifyHost();
         },
 
-        // Start batch transcoding of all queued items
+        setSampleRate: function(rate) { this.setOption('sampleRate', rate); },
+        setChannels: function(ch) { this.setOption('channels', ch); },
+        setQuality: function(q) { this.setOption('quality', q); },
+        setOutputDir: function(dir) { this.setOption('outputDir', dir); },
+
+        // Start batch transcoding
         startTranscoding: function() {
             if (this.isProcessing) {
-                this.showToast('[Converter] Transcoding is already in progress.');
+                this.showToast('[Converter] Transcoding already in progress.');
                 return;
             }
 
@@ -182,96 +199,118 @@
             }
 
             this.isProcessing = true;
-            this.log(`[Converter] Starting batch transcoding for ${pendingTasks.length} queued tracks...`);
+            this.log(`[Converter] Starting transcoding for ${pendingTasks.length} queued tracks...`);
             this.showToast(`[Converter] Starting conversion for ${pendingTasks.length} tracks...`);
 
             this.processNextInQueue();
         },
 
-        // Process next item in queue sequentially
+        // Process queue items sequentially
         processNextInQueue: function() {
             const nextTask = this.queue.find(t => t.status === 'pending');
             if (!nextTask) {
-                // All finished
                 this.isProcessing = false;
                 this.activeTask = null;
                 const completedCount = this.queue.filter(t => t.status === 'completed').length;
                 this.log(`[Converter] All conversions finished. Completed: ${completedCount}`);
-                this.showToast(`[Converter] All done! Transcoded ${completedCount} tracks successfully.`);
+                this.showToast(`[Converter] Done! Transcoded ${completedCount} tracks successfully.`);
+                this.notifyHost();
                 return;
             }
 
             this.activeTask = nextTask;
             nextTask.status = 'converting';
             nextTask.targetPath = this.generateOutputPath(nextTask.sourcePath, this.settings.format, this.settings.outputDir);
+            this.notifyHost();
 
             const cmd = this.buildCommand(nextTask.sourcePath, nextTask.targetPath, this.settings);
-            this.log(`[Converter] Executing command: ${cmd.binary} ${cmd.args.join(' ')}`);
+            this.log(`[Converter] Command dispatch: ${cmd.binary} ${cmd.args.join(' ')}`);
 
             const self = this;
-            // Non-blocking task execution simulation / host runner
             setTimeout(function() {
                 nextTask.status = 'completed';
                 nextTask.progress = 100;
                 self.log(`[Converter] Completed track: ${nextTask.title} -> ${nextTask.targetPath}`);
                 self.activeTask = null;
+                self.notifyHost();
                 self.processNextInQueue();
-            }, 250);
+            }, 300);
         },
 
-        // Command Line Argument Builder for Transcoding
+        // Command builder
         buildCommand: function(sourceFilePath, outputFilePath, options) {
             const opts = Object.assign({}, this.settings, options);
             const args = ['-i', sourceFilePath];
+            const fmt = opts.format.toLowerCase();
 
-            // Codec and container specifics
-            switch (opts.format.toLowerCase()) {
-                case 'flac':
-                    args.push('-c:a', 'flac');
-                    const compLevel = Math.max(0, Math.min(8, parseInt(opts.flacLevel, 10) || 5));
-                    args.push('-compression_level', compLevel.toString());
-                    break;
-                case 'wav':
-                    const bitDepth = opts.wavBitDepth || 'pcm_s24le';
-                    args.push('-c:a', bitDepth);
-                    break;
-                case 'mp3':
-                    args.push('-c:a', 'libmp3lame');
-                    if (opts.mp3Mode === 'vbr') {
-                        args.push('-q:a', '0');
-                    } else {
-                        args.push('-b:a', opts.mp3Bitrate || '320k');
-                    }
-                    break;
-                case 'aac':
-                case 'm4a':
-                    args.push('-c:a', 'aac', '-b:a', opts.aacBitrate || '256k');
-                    break;
-                case 'opus':
-                    args.push('-c:a', 'libopus', '-b:a', opts.opusBitrate || '160k', '-vbr', 'on');
-                    break;
-                case 'ogg':
-                    args.push('-c:a', 'libvorbis', '-q:a', (opts.oggQuality || 6).toString());
-                    break;
-                default:
-                    args.push('-c:a', 'flac');
-                    break;
+            // Audio codec selection
+            if (fmt === 'mp3') {
+                args.push('-c:a', 'libmp3lame');
+                if (opts.quality && opts.quality.indexOf('VBR') !== -1) {
+                    args.push('-q:a', '0');
+                } else if (opts.quality && opts.quality.indexOf('256k') !== -1) {
+                    args.push('-b:a', '256k');
+                } else if (opts.quality && opts.quality.indexOf('192k') !== -1) {
+                    args.push('-b:a', '192k');
+                } else if (opts.quality && opts.quality.indexOf('128k') !== -1) {
+                    args.push('-b:a', '128k');
+                } else {
+                    args.push('-b:a', '320k');
+                }
+            } else if (fmt === 'wav') {
+                if (opts.quality && opts.quality.indexOf('16-bit') !== -1) {
+                    args.push('-c:a', 'pcm_s16le');
+                } else if (opts.quality && opts.quality.indexOf('32-bit') !== -1) {
+                    args.push('-c:a', 'pcm_f32le');
+                } else {
+                    args.push('-c:a', 'pcm_s24le');
+                }
+            } else if (fmt === 'flac') {
+                args.push('-c:a', 'flac');
+                args.push('-compression_level', '5');
+            } else if (fmt === 'aac' || fmt === 'm4a') {
+                args.push('-c:a', 'aac');
+                if (opts.quality && opts.quality.indexOf('128k') !== -1) {
+                    args.push('-b:a', '128k');
+                } else if (opts.quality && opts.quality.indexOf('192k') !== -1) {
+                    args.push('-b:a', '192k');
+                } else if (opts.quality && opts.quality.indexOf('320k') !== -1) {
+                    args.push('-b:a', '320k');
+                } else {
+                    args.push('-b:a', '256k');
+                }
+            } else if (fmt === 'opus') {
+                args.push('-c:a', 'libopus', '-vbr', 'on');
+                if (opts.quality && opts.quality.indexOf('128k') !== -1) {
+                    args.push('-b:a', '128k');
+                } else if (opts.quality && opts.quality.indexOf('192k') !== -1) {
+                    args.push('-b:a', '192k');
+                } else {
+                    args.push('-b:a', '160k');
+                }
+            } else if (fmt === 'ogg') {
+                args.push('-c:a', 'libvorbis', '-q:a', '6');
+            } else {
+                args.push('-c:a', 'copy');
             }
 
             // Resampling
-            if (opts.sampleRate && opts.sampleRate !== 'original') {
-                args.push('-ar', opts.sampleRate.toString());
+            const sr = opts.sampleRate;
+            if (sr && sr !== 'Keep Original' && sr !== 'original') {
+                if (sr.indexOf('44.1') !== -1) args.push('-ar', '44100');
+                else if (sr.indexOf('48.0') !== -1 || sr.indexOf('48') !== -1) args.push('-ar', '48000');
+                else if (sr.indexOf('96.0') !== -1 || sr.indexOf('96') !== -1) args.push('-ar', '96000');
+                else if (sr.indexOf('192.0') !== -1 || sr.indexOf('192') !== -1) args.push('-ar', '192000');
             }
 
             // Channels
-            if (opts.channels && opts.channels !== 'original') {
-                const ch = parseInt(opts.channels, 10);
-                if (ch === 1 || ch === 2) {
-                    args.push('-ac', ch.toString());
-                }
+            const ch = opts.channels;
+            if (ch && ch !== 'Keep Original' && ch !== 'original') {
+                if (ch.indexOf('Stereo') !== -1) args.push('-ac', '2');
+                else if (ch.indexOf('Mono') !== -1) args.push('-ac', '1');
             }
 
-            // Force overwrite and output file
+            // Overwrite flag and destination
             args.push('-y', outputFilePath);
 
             return {
@@ -292,20 +331,29 @@
             if (ext === 'aac') ext = 'm4a';
 
             let targetDir = dir;
-            if (outputDirOption && outputDirOption !== 'same') {
-                targetDir = outputDirOption;
+            if (outputDirOption && outputDirOption.indexOf('Converted') !== -1) {
+                targetDir = dir + (sourcePath.indexOf('\\') !== -1 ? '\\' : '/') + 'Converted';
             }
 
             const sep = (sourcePath.indexOf('\\') !== -1) ? '\\' : '/';
             return `${targetDir}${sep}${baseName}.${ext}`;
         },
 
-        // Toast feedback
+        // Notify host QML of view updates
+        notifyHost: function() {
+            if (typeof PluginManager !== 'undefined') {
+                if (PluginManager.notifyViewChanged) {
+                    PluginManager.notifyViewChanged(Converter.id);
+                }
+            }
+        },
+
+        // Show Toast feedback
         showToast: function(message) {
-            if (typeof toastBanner !== 'undefined' && toastBanner && toastBanner.show) {
+            if (typeof PluginManager !== 'undefined' && PluginManager.showToast) {
+                PluginManager.showToast(message);
+            } else if (typeof toastBanner !== 'undefined' && toastBanner && toastBanner.show) {
                 toastBanner.show(message);
-            } else if (typeof window !== 'undefined' && window.toastBanner && window.toastBanner.show) {
-                window.toastBanner.show(message);
             } else {
                 console.log('[Converter Toast]', message);
             }

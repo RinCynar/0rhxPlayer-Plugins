@@ -1,12 +1,14 @@
 {
   "name": "Audio Converter",
-  "description": "Professional audio transcoder supporting FLAC, WAV, MP3, AAC, Opus, and OGG with queue management and system PATH toolchain detection.",
+  "description": "Universal high-fidelity audio transcoder supporting MP3, WAV, FLAC, AAC, Opus, and OGG with full parameter controls.",
   "workbench_title": "Audio Converter Workbench",
+  "toolchain_title": "System Toolchain Status",
   "queue_title": "Transcoding Queue (Job List)",
-  "toolchain_title": "System PATH Toolchain Probe",
-  "formats_title": "Target Format Configuration",
-  "resampling_title": "Audio Resampling & Channel Layout",
-  "export_dir_title": "Export Directory Strategy",
+  "formats_title": "Target Audio Format",
+  "resampling_title": "Audio Resampling Rate",
+  "channels_title": "Channel Layout",
+  "quality_title": "Encoding Quality & Bit Depth",
+  "export_dir_title": "Export Destination Directory",
   "start_transcode_title": "Start Transcoding (Batch Execution)",
   "add_to_queue": "Add to Convert Queue"
 }

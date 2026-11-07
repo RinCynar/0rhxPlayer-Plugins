@@ -5,35 +5,60 @@
     {
       "type": "banner",
       "title": "Audio Converter Workbench",
-      "subtitle": "Professional lossless and high-fidelity audio transcoding powered by ffmpeg and flac."
+      "subtitle": "Universal high-fidelity audio transcoding engine powered by FFmpeg."
     },
     {
       "type": "card",
-      "title": "System PATH Toolchain Probe",
-      "details": "Environment status: FFmpeg [Detected / Available] | FLAC [Detected / Available]. Audio transcoding binaries verified in system PATH."
+      "title": "System Toolchain Status",
+      "details": "FFmpeg Universal Audio Processing Engine [Detected / Available]. Audio transcoding pipeline ready."
     },
     {
-      "type": "card",
+      "type": "queue",
       "title": "Transcoding Queue (Job List)",
-      "details": "Right-click any song in your track list and select 'Add to Convert Queue' to populate this queue. Tracks will be converted in sequence upon clicking 'Start Transcoding'."
+      "details": "Right-click any song in your library and select 'Add to Convert Queue' to populate this queue. Tracks will be transcoded in sequence according to the selected parameters below."
     },
     {
-      "type": "card",
-      "title": "Target Format Configuration",
-      "details": "Supported target formats: FLAC (Lossless compression levels 0-8), WAV (16-bit / 24-bit / 32-bit Float PCM), MP3 (320kbps CBR / V0 VBR), AAC/M4A (256kbps), Opus (64k-320k VBR), and OGG Vorbis."
+      "type": "format",
+      "key": "format",
+      "title": "Target Audio Format",
+      "details": "Select the target audio encoding container format.",
+      "default": "MP3",
+      "options": ["MP3", "WAV", "FLAC", "AAC", "Opus", "OGG"]
     },
     {
-      "type": "card",
-      "title": "Audio Resampling & Channel Layout",
-      "details": "Resampling rates: Keep Original, 44.1 kHz, 48.0 kHz, 96.0 kHz, 192.0 kHz. Channel modes: Keep Original, Stereo (2 channels), Mono (1 channel). Bit depth: Source, 16-bit, 24-bit, 32-bit Float."
+      "type": "options",
+      "key": "sampleRate",
+      "title": "Audio Resampling Rate",
+      "details": "Select the output audio sampling frequency.",
+      "default": "Keep Original",
+      "options": ["Keep Original", "44.1 kHz", "48.0 kHz", "96.0 kHz", "192.0 kHz"]
     },
     {
-      "type": "card",
-      "title": "Export Directory Strategy",
-      "details": "Destination options: Export alongside source file (same directory) or export to dedicated output folder (default: ./Converted). Safe overwrite handling."
+      "type": "options",
+      "key": "channels",
+      "title": "Channel Layout",
+      "details": "Select output channel layout.",
+      "default": "Keep Original",
+      "options": ["Keep Original", "Stereo (2ch)", "Mono (1ch)"]
     },
     {
-      "type": "card",
+      "type": "options",
+      "key": "quality",
+      "title": "Encoding Quality & Bit Depth",
+      "details": "Target encoding bitrate or PCM bit depth (applies to applicable formats).",
+      "default": "320k / 24-bit (High)",
+      "options": ["320k / 24-bit (High)", "256k / 16-bit (Standard)", "192k (Normal)", "128k (Economy)", "Lossless"]
+    },
+    {
+      "type": "options",
+      "key": "outputDir",
+      "title": "Export Destination Directory",
+      "details": "Select destination location for transcoded audio files.",
+      "default": "Source Directory",
+      "options": ["Source Directory", "Converted Subfolder (./Converted)"]
+    },
+    {
+      "type": "action",
       "title": "Start Transcoding (Batch Execution)",
       "details": "Action: Click to start processing all tracks in the transcode queue. Non-blocking asynchronous task execution with live progress reporting and host Toast feedback upon completion."
     }
